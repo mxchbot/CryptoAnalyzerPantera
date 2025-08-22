@@ -1,8 +1,13 @@
 package com.javarush.chebotarev;
 
+import java.nio.file.Path;
 import java.util.Scanner;
 
 public class Console {
+
+    public String scanLine() {
+        return scanner.nextLine().trim();
+    }
 
     public void printGreetings() {
         System.out.println(Messages.GREETINGS);
@@ -12,39 +17,57 @@ public class Console {
         System.out.println(Messages.MENU);
     }
 
-    public Mode scanMode() {
-        int input;
-        Mode mode;
-
-        for (;;) {
-            printEnterMode();
-
-            try {
-                input = scanner.nextInt();
-            } catch (RuntimeException e) {
-                printInvalidMode();
-                scanner.nextLine();
-                continue;
-            }
-
-            try {
-                mode = Mode.values()[input];
-            } catch (ArrayIndexOutOfBoundsException e) {
-                printInvalidMode();
-                continue;
-            }
-
-            return mode;
-        }
-    }
-
-    private void printEnterMode() {
+    public void printEnterMode() {
         System.out.println(Messages.ENTER_MODE);
     }
 
-    private void printInvalidMode() {
+    public void printInvalidMode() {
         System.out.println(Messages.INVALID_MODE);
     }
 
-    Scanner scanner = new Scanner(System.in);
+    public void printEnterInputFilepath(String defaultInputFilepath) {
+        System.out.printf(Messages.ENTER_INPUT_FILEPATH_FORMAT, defaultInputFilepath);
+    }
+
+    public void printEnterOutputFilepath(String defaultOutputFilepath) {
+        System.out.printf(Messages.ENTER_OUTPUT_FILEPATH_FORMAT, defaultOutputFilepath);
+    }
+
+    public void printFailedToOpenFileForReading(Path path) {
+        printFailedToOpenFile(path, Messages.FAILED_TO_OPEN_FILE_FOR_READING_FORMAT);
+    }
+
+    public void printFailedToOpenFileForWriting(Path path) {
+        printFailedToOpenFile(path, Messages.FAILED_TO_OPEN_FILE_FOR_WRITING_FORMAT);
+    }
+
+    public void printEnterKey() {
+        System.out.println(Messages.ENTER_KEY);
+    }
+
+    public void printInvalidKey() {
+        System.out.println(Messages.INVALID_KEY);
+    }
+
+    public void printFileEncrypted() {
+        System.out.println(Messages.FILE_ENCRYPTED);
+    }
+
+    public void printFileDecrypted() {
+        System.out.println(Messages.FILE_DECRYPTED);
+    }
+
+    public void printCurrentWorkingDirectory() {
+        Path path = Path.of("");
+        Path absolutePath = path.toAbsolutePath();
+        System.out.printf(Messages.CURRENT_WORKING_DIRECTORY_FORMAT, absolutePath);
+    }
+
+    private void printFailedToOpenFile(Path path, String messageFormat) {
+        Path absolutePath = path.toAbsolutePath();
+        Path normalizedAbsolutePath = absolutePath.normalize();
+        System.out.printf(messageFormat, normalizedAbsolutePath);
+    }
+
+    private final Scanner scanner = new Scanner(System.in);
 }

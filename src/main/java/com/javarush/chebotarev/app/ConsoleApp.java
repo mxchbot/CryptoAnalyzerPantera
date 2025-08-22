@@ -1,7 +1,12 @@
 package com.javarush.chebotarev.app;
 
-import com.javarush.chebotarev.Console;
-import com.javarush.chebotarev.Mode;
+import com.javarush.chebotarev.*;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class ConsoleApp {
 
@@ -13,11 +18,10 @@ public class ConsoleApp {
     private void run() {
         console.printGreetings();
 
-        for (;;) {
+        for (; ; ) {
             console.printMenu();
 
-            Mode mode = console.scanMode();
-
+            Mode mode = obtainMode();
             switch (mode) {
                 case ENCRYPT:
                     doEncrypt();
@@ -32,12 +36,127 @@ public class ConsoleApp {
     }
 
     private void doEncrypt() {
+        BufferedReader fileReader = obtainFileReader(DEFAULT_ENCRYPT_INPUT_FILEPATH);
+        BufferedWriter fileWriter = obtainFileWriter(DEFAULT_ENCRYPT_OUTPUT_FILEPATH);
+        int key = obtainKey();
 
+        cipher.encrypt(fileReader, fileWriter, key);
+        console.printFileEncrypted();
+
+        try {
+            fileReader.close();
+            fileWriter.close();
+        } catch (IOException e) {
+            throw new AppException(e.getMessage(), e);
+        }
     }
 
     private void doDecrypt() {
+        BufferedReader fileReader = obtainFileReader(DEFAULT_DECRYPT_INPUT_FILEPATH);
+        BufferedWriter fileWriter = obtainFileWriter(DEFAULT_DECRYPT_OUTPUT_FILEPATH);
+        int key = obtainKey();
 
+        cipher.decrypt(fileReader, fileWriter, key);
+        console.printFileDecrypted();
+
+        try {
+            fileReader.close();
+            fileWriter.close();
+        } catch (IOException e) {
+            throw new AppException(e.getMessage(), e);
+        }
     }
 
-    Console console = new Console();
+    private Mode obtainMode() {
+        Mode result;
+        int modeIndex;
+
+        for (; ; ) {
+            console.printEnterMode();
+
+            try {
+                modeIndex = Integer.parseInt(console.scanLine());
+                result = Mode.values()[modeIndex];
+            } catch (RuntimeException e) {
+                console.printInvalidMode();
+                continue;
+            }
+
+            return result;
+        }
+    }
+
+    private BufferedReader obtainFileReader(String defaultInputFilepath) {
+        BufferedReader result;
+        String filepath;
+        Path path;
+
+        for (; ; ) {
+            console.printCurrentWorkingDirectory();
+            console.printEnterInputFilepath(defaultInputFilepath);
+
+            filepath = console.scanLine();
+            if (filepath.isEmpty()) {
+                filepath = defaultInputFilepath;
+            }
+            path = Path.of(filepath);
+            try {
+                result = Files.newBufferedReader(path);
+            } catch (Exception e) {
+                console.printFailedToOpenFileForReading(path);
+                continue;
+            }
+
+            return result;
+        }
+    }
+
+    private BufferedWriter obtainFileWriter(String defaultOutputFilepath) {
+        BufferedWriter result;
+        String filepath;
+        Path path;
+
+        for (; ; ) {
+            console.printCurrentWorkingDirectory();
+            console.printEnterOutputFilepath(defaultOutputFilepath);
+
+            filepath = console.scanLine();
+            if (filepath.isEmpty()) {
+                filepath = defaultOutputFilepath;
+            }
+            path = Path.of(filepath);
+            try {
+                result = Files.newBufferedWriter(path);
+            } catch (Exception e) {
+                console.printFailedToOpenFileForWriting(path);
+                continue;
+            }
+
+            return result;
+        }
+    }
+
+    private int obtainKey() {
+        int result;
+
+        for (; ; ) {
+            console.printEnterKey();
+
+            try {
+                result = Integer.parseInt(console.scanLine());
+            } catch (RuntimeException e) {
+                console.printInvalidKey();
+                continue;
+            }
+
+            return result;
+        }
+    }
+
+    private final Console console = new Console();
+    private final Cipher cipher = new Cipher();
+    private static final String DEFAULT_ENCRYPT_INPUT_FILEPATH = "./text/text.txt";
+    private static final String DEFAULT_ENCRYPT_OUTPUT_FILEPATH = "./text/out.txt";
+    private static final String DEFAULT_DECRYPT_INPUT_FILEPATH = "./text/out.txt";
+    private static final String DEFAULT_DECRYPT_OUTPUT_FILEPATH = "./text/text2.txt";
 }
