@@ -1,10 +1,9 @@
 package com.javarush.chebotarev.app;
 
 import com.javarush.chebotarev.*;
+import com.javarush.chebotarev.Console;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -29,6 +28,9 @@ public class ConsoleApp {
                 case DECRYPT:
                     doDecrypt();
                     break;
+                case BRUTEFORCE:
+                    doDecryptByBruteForce();
+                    break;
                 case EXIT:
                     return;
             }
@@ -36,7 +38,7 @@ public class ConsoleApp {
     }
 
     private void doEncrypt() {
-        BufferedReader fileReader = obtainFileReader(DEFAULT_ENCRYPT_INPUT_FILEPATH);
+        RandomAccessFile fileReader = obtainFileReader(DEFAULT_ENCRYPT_INPUT_FILEPATH);
         BufferedWriter fileWriter = obtainFileWriter(DEFAULT_ENCRYPT_OUTPUT_FILEPATH);
         int key = obtainKey();
 
@@ -52,12 +54,27 @@ public class ConsoleApp {
     }
 
     private void doDecrypt() {
-        BufferedReader fileReader = obtainFileReader(DEFAULT_DECRYPT_INPUT_FILEPATH);
+        RandomAccessFile fileReader = obtainFileReader(DEFAULT_DECRYPT_INPUT_FILEPATH);
         BufferedWriter fileWriter = obtainFileWriter(DEFAULT_DECRYPT_OUTPUT_FILEPATH);
         int key = obtainKey();
 
         cipher.decrypt(fileReader, fileWriter, key);
         console.printFileDecrypted();
+
+        try {
+            fileReader.close();
+            fileWriter.close();
+        } catch (IOException e) {
+            throw new AppException(e.getMessage(), e);
+        }
+    }
+
+    private void doDecryptByBruteForce() {
+        RandomAccessFile fileReader = obtainFileReader(DEFAULT_DECRYPT_INPUT_FILEPATH);
+        BufferedWriter fileWriter = obtainFileWriter(DEFAULT_DECRYPT_OUTPUT_FILEPATH);
+
+        cipher.decryptByBruteForce(fileReader, fileWriter);
+        console.printFileDecryptedByBruteForce();
 
         try {
             fileReader.close();
@@ -86,8 +103,8 @@ public class ConsoleApp {
         }
     }
 
-    private BufferedReader obtainFileReader(String defaultInputFilepath) {
-        BufferedReader result;
+    private RandomAccessFile obtainFileReader(String defaultInputFilepath) {
+        RandomAccessFile result;
         String filepath;
         Path path;
 
@@ -101,7 +118,7 @@ public class ConsoleApp {
             }
             path = Path.of(filepath);
             try {
-                result = Files.newBufferedReader(path);
+                result = new RandomAccessFile(path.toFile(), "r");
             } catch (Exception e) {
                 console.printFailedToOpenFileForReading(path);
                 continue;
@@ -157,6 +174,6 @@ public class ConsoleApp {
     private final Cipher cipher = new Cipher();
     private static final String DEFAULT_ENCRYPT_INPUT_FILEPATH = "./text/text.txt";
     private static final String DEFAULT_ENCRYPT_OUTPUT_FILEPATH = "./text/out.txt";
-    private static final String DEFAULT_DECRYPT_INPUT_FILEPATH = "./text/out.txt";
+    private static final String DEFAULT_DECRYPT_INPUT_FILEPATH = DEFAULT_ENCRYPT_OUTPUT_FILEPATH;
     private static final String DEFAULT_DECRYPT_OUTPUT_FILEPATH = "./text/text2.txt";
 }

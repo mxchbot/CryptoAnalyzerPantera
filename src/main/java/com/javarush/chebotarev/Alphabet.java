@@ -9,12 +9,9 @@ public class Alphabet {
         return instance;
     }
 
-    public boolean contains(char character) {
-        return indexMap.containsKey(character);
-    }
-
     public int getIndex(char character) {
-        return indexMap.get(character);
+        Integer index = indexMap.get(character);
+        return (index != null) ? index : -1;
     }
 
     public int getLength() {

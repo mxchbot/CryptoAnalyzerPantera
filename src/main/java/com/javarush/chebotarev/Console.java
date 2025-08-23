@@ -57,6 +57,10 @@ public class Console {
         System.out.println(Messages.FILE_DECRYPTED);
     }
 
+    public void printFileDecryptedByBruteForce() {
+        System.out.println(Messages.FILE_DECRYPTED_BY_BRUTE_FORCE);
+    }
+
     public void printCurrentWorkingDirectory() {
         Path path = Path.of("");
         Path absolutePath = path.toAbsolutePath();

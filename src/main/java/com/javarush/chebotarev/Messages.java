@@ -7,6 +7,7 @@ public interface Messages {
             """
             1. Encrypt
             2. Decrypt
+            3. Brute-force
             0. Exit
             """
             + LINE;
@@ -21,4 +22,5 @@ public interface Messages {
     String FILE_ENCRYPTED = "File encrypted successfully!";
     String FILE_DECRYPTED = "File decrypted successfully!";
     String CURRENT_WORKING_DIRECTORY_FORMAT = "Current working directory: \"%s\"\n";
+    String FILE_DECRYPTED_BY_BRUTE_FORCE = "File decrypted successfully by brute-force!";
 }
