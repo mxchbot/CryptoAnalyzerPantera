@@ -1,7 +1,8 @@
-package com.javarush.chebotarev.app;
+package com.javarush.chebotarev.component;
 
-import com.javarush.chebotarev.*;
-import com.javarush.chebotarev.Console;
+import com.javarush.chebotarev.action.BruteForce;
+import com.javarush.chebotarev.action.Decrypt;
+import com.javarush.chebotarev.action.Encrypt;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -9,12 +10,14 @@ import java.nio.file.Path;
 
 public class ConsoleApp {
 
-    public static void main(String[] args) {
-        ConsoleApp app = new ConsoleApp();
-        app.run();
+    public ConsoleApp(Console console, Encrypt encrypt, Decrypt decrypt, BruteForce bruteForce) {
+        this.console = console;
+        this.encrypt = encrypt;
+        this.decrypt = decrypt;
+        this.bruteForce = bruteForce;
     }
 
-    private void run() {
+    public void run() {
         console.printGreetings();
 
         for (; ; ) {
@@ -42,7 +45,7 @@ public class ConsoleApp {
         BufferedWriter fileWriter = obtainFileWriter(DEFAULT_ENCRYPT_OUTPUT_FILEPATH);
         int key = obtainKey();
 
-        cipher.encrypt(fileReader, fileWriter, key);
+        encrypt.doAction(fileReader, fileWriter, key);
         console.printFileEncrypted();
 
         try {
@@ -58,7 +61,7 @@ public class ConsoleApp {
         BufferedWriter fileWriter = obtainFileWriter(DEFAULT_DECRYPT_OUTPUT_FILEPATH);
         int key = obtainKey();
 
-        cipher.decrypt(fileReader, fileWriter, key);
+        decrypt.doAction(fileReader, fileWriter, key);
         console.printFileDecrypted();
 
         try {
@@ -73,7 +76,7 @@ public class ConsoleApp {
         RandomAccessFile fileReader = obtainFileReader(DEFAULT_DECRYPT_INPUT_FILEPATH);
         BufferedWriter fileWriter = obtainFileWriter(DEFAULT_DECRYPT_OUTPUT_FILEPATH);
 
-        cipher.decryptByBruteForce(fileReader, fileWriter);
+        bruteForce.doAction(fileReader, fileWriter);
         console.printFileDecryptedByBruteForce();
 
         try {
@@ -170,8 +173,10 @@ public class ConsoleApp {
         }
     }
 
-    private final Console console = new Console();
-    private final Cipher cipher = new Cipher();
+    private final Console console;
+    private final Encrypt encrypt;
+    private final Decrypt decrypt;
+    private final BruteForce bruteForce;
     private static final String DEFAULT_ENCRYPT_INPUT_FILEPATH = "./text/text.txt";
     private static final String DEFAULT_ENCRYPT_OUTPUT_FILEPATH = "./text/out.txt";
     private static final String DEFAULT_DECRYPT_INPUT_FILEPATH = DEFAULT_ENCRYPT_OUTPUT_FILEPATH;

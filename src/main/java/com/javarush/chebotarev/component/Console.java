@@ -1,9 +1,13 @@
-package com.javarush.chebotarev;
+package com.javarush.chebotarev.component;
 
 import java.nio.file.Path;
 import java.util.Scanner;
 
 public class Console {
+
+    public Console(Scanner scanner) {
+        this.scanner = scanner;
+    }
 
     public String scanLine() {
         return scanner.nextLine().trim();
@@ -73,5 +77,5 @@ public class Console {
         System.out.printf(messageFormat, normalizedAbsolutePath);
     }
 
-    private final Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner;
 }

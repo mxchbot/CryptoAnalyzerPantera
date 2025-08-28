@@ -1,12 +1,14 @@
-package com.javarush.chebotarev;
+package com.javarush.chebotarev.component;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Alphabet {
 
-    public static Alphabet getInstance() {
-        return instance;
+    public Alphabet() {
+        for (int i = 0; i < CHARACTERS.length; i++) {
+            indexMap.put(CHARACTERS[i], i);
+        }
     }
 
     public int getIndex(char character) {
@@ -22,13 +24,6 @@ public class Alphabet {
         return CHARACTERS[index];
     }
 
-    private Alphabet() {
-        for (int i = 0; i < CHARACTERS.length; i++) {
-            indexMap.put(CHARACTERS[i], i);
-        }
-    }
-
-    private static final Alphabet instance = new Alphabet();
     private final Map<Character, Integer> indexMap = new HashMap<>();
     private final char[] CHARACTERS = {
             'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж',
