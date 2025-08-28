@@ -97,7 +97,7 @@ public class ConsoleApp {
             try {
                 modeIndex = Integer.parseInt(console.scanLine());
                 result = Mode.values()[modeIndex];
-            } catch (RuntimeException e) {
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
                 console.printInvalidMode();
                 continue;
             }
@@ -122,7 +122,7 @@ public class ConsoleApp {
             path = Path.of(filepath);
             try {
                 result = new RandomAccessFile(path.toFile(), "r");
-            } catch (Exception e) {
+            } catch (FileNotFoundException e) {
                 console.printFailedToOpenFileForReading(path);
                 continue;
             }
@@ -147,7 +147,7 @@ public class ConsoleApp {
             path = Path.of(filepath);
             try {
                 result = Files.newBufferedWriter(path);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 console.printFailedToOpenFileForWriting(path);
                 continue;
             }
@@ -164,7 +164,7 @@ public class ConsoleApp {
 
             try {
                 result = Integer.parseInt(console.scanLine());
-            } catch (RuntimeException e) {
+            } catch (NumberFormatException e) {
                 console.printInvalidKey();
                 continue;
             }
