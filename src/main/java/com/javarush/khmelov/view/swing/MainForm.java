@@ -8,6 +8,9 @@ import com.javarush.khmelov.util.PathBuilder;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -60,9 +63,15 @@ public class MainForm extends JFrame {
     private JTextField ch1;
     private JTextField ch2;
     private JLabel currentFilename;
+    private JButton copyAllText;
 
     public MainForm(MainController controller) {
         this.controller = controller;
+        copyAllText.addActionListener(e -> {
+            StringSelection selection = new StringSelection(textArea.getText());
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(selection, null);
+        });
     }
 
     static {
@@ -78,7 +87,8 @@ public class MainForm extends JFrame {
                     break;
                 }
             }
-        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException |
+                 IllegalAccessException e) {
             LookAndFeel lookAndFeel = UIManager.getLookAndFeel();
             System.out.println(lookAndFeel);
         }
@@ -169,6 +179,20 @@ public class MainForm extends JFrame {
             text = text.replace('~', ch2);
             textArea.setText(text);
             textArea.setCaretPosition(0);
+        });
+
+
+        // Добавляем действие копирования для Ctrl+C
+        InputMap inputMap = textArea.getInputMap(JComponent.WHEN_FOCUSED);
+        KeyStroke copyKey = KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK);
+        inputMap.put(copyKey, "copy");
+        textArea.getActionMap().put("copy", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                StringSelection selection = new StringSelection(textArea.getText());
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(selection, null);
+            }
         });
     }
 

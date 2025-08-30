@@ -20,7 +20,7 @@ public class Menu {
             String quest = QUESTIONS[mode][i][0];
             System.out.println(quest);
             String answer = scanner.nextLine();
-            args[i] = "".equals(answer.trim()) ? QUESTIONS[mode][i][1] : answer;
+            args[i] = answer.trim().isEmpty() ? QUESTIONS[mode][i][1] : answer;
         }
         return args;
     }

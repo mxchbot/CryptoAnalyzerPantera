@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.javarush.khmelov.view.swing.MainForm">
   <grid id="27dc6" binding="panel" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="905" height="594"/>
+      <xy x="20" y="20" width="905" height="617"/>
     </constraints>
     <properties/>
     <border type="empty">
@@ -63,7 +63,7 @@
           </component>
           <component id="64b9f" class="javax.swing.JButton" binding="swap">
             <constraints>
-              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
               <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
@@ -86,6 +86,15 @@
             </constraints>
             <properties>
               <text value="Second Character"/>
+            </properties>
+          </component>
+          <component id="e377e" class="javax.swing.JButton" binding="copyAllText">
+            <constraints>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <text value="Copy All Text"/>
             </properties>
           </component>
         </children>
