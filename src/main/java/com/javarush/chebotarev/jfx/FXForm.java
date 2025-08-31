@@ -6,6 +6,7 @@ import com.javarush.chebotarev.action.Encrypt;
 import com.javarush.chebotarev.component.Alphabet;
 import com.javarush.chebotarev.component.AppException;
 import com.javarush.chebotarev.component.Const;
+import com.javarush.chebotarev.component.Mode;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -32,10 +33,11 @@ public class FXForm {
 
     public FXForm(Stage stage, Alphabet alphabet, Encrypt encrypt, Decrypt decrypt, BruteForce bruteForce) {
         this.stage = stage;
+        this.alphabet = alphabet;
         this.encrypt = encrypt;
         this.decrypt = decrypt;
         this.bruteForce = bruteForce;
-        Scene scene = buildSceneAndAddActions(alphabet);
+        Scene scene = buildSceneAndAddActions();
         stage.setScene(scene);
         stage.setTitle(TITLE);
     }
@@ -44,11 +46,11 @@ public class FXForm {
         stage.show();
     }
 
-    private Scene buildSceneAndAddActions(Alphabet alphabet) {
+    private Scene buildSceneAndAddActions() {
         BorderPane pane = new BorderPane();
         pane.setTop(getTopNode());
         pane.setCenter(getCenterNode());
-        pane.setBottom(getBottomNode(alphabet));
+        pane.setBottom(getBottomNode());
         updateKeyLabel();
         return new Scene(pane, W_SIZE * SCALE, H_SIZE * SCALE);
     }
@@ -63,6 +65,10 @@ public class FXForm {
         for (int colIndex = 0; colIndex < buttons.length; colIndex++) {
             gridPane.add(buttons[colIndex], colIndex, rowIndex);
         }
+
+        keyLabel = new Label();
+        key = new Slider(1, alphabet.getLength() - 1, 1);
+        key.valueProperty().addListener(e -> updateKeyLabel());
 
         Label inputEncryptLabel = new Label(INPUT_ENCRYPT);
         inputEncrypt = new TextField();
@@ -84,6 +90,8 @@ public class FXForm {
         outputBruteForce.setText(getNormalizedAbsolutePath(Const.DEFAULT_DECRYPT_OUTPUT_FILEPATH).toString());
 
         VBox vBox = new VBox(gridPane,
+                keyLabel,
+                key,
                 inputEncryptLabel,
                 inputEncrypt,
                 outputEncryptLabel,
@@ -106,16 +114,11 @@ public class FXForm {
         return textArea;
     }
 
-    private Node getBottomNode(Alphabet alphabet) {
+    private Node getBottomNode() {
         message = new Label();
         message.setPadding(PADDING);
         message.setFont(Font.font(DEFAULT_FONT, FontWeight.BOLD, DEFAULT_FONT_SIZE));
-        keyLabel = new Label();
-        key = new Slider(1, alphabet.getLength() - 1, 1);
-        key.valueProperty().addListener(e -> updateKeyLabel());
-        VBox vBox = new VBox(keyLabel, key, message);
-        vBox.setPadding(PADDING);
-        return vBox;
+        return message;
     }
 
     private Path getNormalizedAbsolutePath(String filepath) {
@@ -136,10 +139,10 @@ public class FXForm {
 
     private Button[] createTopPanelButtons() {
         Button original = createButton(ORIGINAL, e -> ShowOriginalFile());
-        Button encode = createButton(ENCRYPT, e -> doEncrypt());
-        Button decode = createButton(DECRYPT, e -> doDecrypt());
-        Button bruteForce = createButton(BRUTE_FORCE, e -> doDecryptByBruteForce());
-        return new Button[]{original, encode, decode, bruteForce};//, analyze};
+        Button encode = createButton(ENCRYPT, e -> doAction(Mode.ENCRYPT));
+        Button decode = createButton(DECRYPT, e -> doAction(Mode.DECRYPT));
+        Button bruteForce = createButton(BRUTE_FORCE, e -> doAction(Mode.BRUTEFORCE));
+        return new Button[]{original, encode, decode, bruteForce};
     }
 
     private Button createButton(String name, EventHandler<ActionEvent> eventHandler) {
@@ -161,15 +164,35 @@ public class FXForm {
 
     private void ShowOriginalFile() {
         showTextFromFile(inputEncrypt.getText());
+        message.setText("");
     }
 
-    private void doEncrypt() {
-        RandomAccessFile fileReader = obtainFileReader(inputEncrypt.getText());
+    private void doAction(Mode mode) {
+        String inputFilepath;
+        String outputFilepath;
+        switch (mode) {
+            case ENCRYPT:
+                inputFilepath = inputEncrypt.getText();
+                outputFilepath = outputEncrypt.getText();
+                break;
+            case DECRYPT:
+                inputFilepath = inputDecrypt.getText();
+                outputFilepath = outputDecrypt.getText();
+                break;
+            case BRUTEFORCE:
+                inputFilepath = inputBruteForce.getText();
+                outputFilepath = outputBruteForce.getText();
+                break;
+            default:
+                return;
+        }
+
+        RandomAccessFile fileReader = obtainFileReader(inputFilepath);
         if (fileReader == null) {
             return;
         }
 
-        BufferedWriter fileWriter = obtainFileWriter(outputEncrypt.getText());
+        BufferedWriter fileWriter = obtainFileWriter(outputFilepath);
         if (fileWriter == null) {
             try {
                 fileReader.close();
@@ -179,68 +202,29 @@ public class FXForm {
             return;
         }
 
-        encrypt.doAction(fileReader, fileWriter, getKeyValue());
+        String resultMessage = "";
+        String resultFilepath = "";
+        switch (mode) {
+            case ENCRYPT:
+                encrypt.doAction(fileReader, fileWriter, getKeyValue());
+                resultMessage = Const.FILE_ENCRYPTED;
+                resultFilepath = outputEncrypt.getText();
+                break;
+            case DECRYPT:
+                decrypt.doAction(fileReader, fileWriter, getKeyValue());
+                resultMessage = Const.FILE_DECRYPTED;
+                resultFilepath = outputDecrypt.getText();
+                break;
+            case BRUTEFORCE:
+                bruteForce.doAction(fileReader, fileWriter);
+                resultMessage = Const.FILE_DECRYPTED_BY_BRUTE_FORCE;
+                resultFilepath = outputBruteForce.getText();
+                break;
+        }
+
         message.setTextFill(Color.BLUE);
-        message.setText(Const.FILE_ENCRYPTED);
-        showTextFromFile(outputEncrypt.getText());
-
-        try {
-            fileReader.close();
-            fileWriter.close();
-        } catch (IOException e) {
-            throw new AppException(e.getMessage(), e);
-        }
-    }
-
-    private void doDecrypt() {
-        RandomAccessFile fileReader = obtainFileReader(inputDecrypt.getText());
-        if (fileReader == null) {
-            return;
-        }
-
-        BufferedWriter fileWriter = obtainFileWriter(outputDecrypt.getText());
-        if (fileWriter == null) {
-            try {
-                fileReader.close();
-            } catch (IOException e) {
-                throw new AppException(e.getMessage(), e);
-            }
-            return;
-        }
-
-        decrypt.doAction(fileReader, fileWriter, getKeyValue());
-        message.setTextFill(Color.BLUE);
-        message.setText(Const.FILE_DECRYPTED);
-        showTextFromFile(outputDecrypt.getText());
-
-        try {
-            fileReader.close();
-            fileWriter.close();
-        } catch (IOException e) {
-            throw new AppException(e.getMessage(), e);
-        }
-    }
-
-    private void doDecryptByBruteForce() {
-        RandomAccessFile fileReader = obtainFileReader(inputBruteForce.getText());
-        if (fileReader == null) {
-            return;
-        }
-
-        BufferedWriter fileWriter = obtainFileWriter(outputBruteForce.getText());
-        if (fileWriter == null) {
-            try {
-                fileReader.close();
-            } catch (IOException e) {
-                throw new AppException(e.getMessage(), e);
-            }
-            return;
-        }
-
-        bruteForce.doAction(fileReader, fileWriter);
-        message.setTextFill(Color.BLUE);
-        message.setText(Const.FILE_DECRYPTED_BY_BRUTE_FORCE);
-        showTextFromFile(outputBruteForce.getText());
+        message.setText(resultMessage);
+        showTextFromFile(resultFilepath);
 
         try {
             fileReader.close();
@@ -309,6 +293,7 @@ public class FXForm {
     private TextField outputBruteForce;
 
     private final Stage stage;
+    private final Alphabet alphabet;
     private final Encrypt encrypt;
     private final Decrypt decrypt;
     private final BruteForce bruteForce;

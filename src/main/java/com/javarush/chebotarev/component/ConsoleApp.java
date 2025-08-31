@@ -24,60 +24,44 @@ public class ConsoleApp {
             console.printMenu();
 
             Mode mode = obtainMode();
-            switch (mode) {
-                case ENCRYPT:
-                    doEncrypt();
-                    break;
-                case DECRYPT:
-                    doDecrypt();
-                    break;
-                case BRUTEFORCE:
-                    doDecryptByBruteForce();
-                    break;
-                case EXIT:
-                    return;
+            if (mode == Mode.EXIT) {
+                return;
             }
+            doAction(mode);
         }
     }
 
-    private void doEncrypt() {
-        RandomAccessFile fileReader = obtainFileReader(Const.DEFAULT_ENCRYPT_INPUT_FILEPATH);
-        BufferedWriter fileWriter = obtainFileWriter(Const.DEFAULT_ENCRYPT_OUTPUT_FILEPATH);
-        int key = obtainKey();
-
-        encrypt.doAction(fileReader, fileWriter, key);
-        console.printFileEncrypted();
-
-        try {
-            fileReader.close();
-            fileWriter.close();
-        } catch (IOException e) {
-            throw new AppException(e.getMessage(), e);
+    private void doAction(Mode mode) {
+        String defaultInputFilepath;
+        String defaultOutputFilepath;
+        if (mode == Mode.ENCRYPT) {
+            defaultInputFilepath = Const.DEFAULT_ENCRYPT_INPUT_FILEPATH;
+            defaultOutputFilepath = Const.DEFAULT_ENCRYPT_OUTPUT_FILEPATH;
+        } else {
+            defaultInputFilepath = Const.DEFAULT_DECRYPT_INPUT_FILEPATH;
+            defaultOutputFilepath = Const.DEFAULT_DECRYPT_OUTPUT_FILEPATH;
         }
-    }
 
-    private void doDecrypt() {
-        RandomAccessFile fileReader = obtainFileReader(Const.DEFAULT_DECRYPT_INPUT_FILEPATH);
-        BufferedWriter fileWriter = obtainFileWriter(Const.DEFAULT_DECRYPT_OUTPUT_FILEPATH);
-        int key = obtainKey();
-
-        decrypt.doAction(fileReader, fileWriter, key);
-        console.printFileDecrypted();
-
-        try {
-            fileReader.close();
-            fileWriter.close();
-        } catch (IOException e) {
-            throw new AppException(e.getMessage(), e);
+        RandomAccessFile fileReader = obtainFileReader(defaultInputFilepath);
+        BufferedWriter fileWriter = obtainFileWriter(defaultOutputFilepath);
+        int key = 0;
+        if (mode != Mode.BRUTEFORCE) {
+            key = obtainKey();
         }
-    }
 
-    private void doDecryptByBruteForce() {
-        RandomAccessFile fileReader = obtainFileReader(Const.DEFAULT_DECRYPT_INPUT_FILEPATH);
-        BufferedWriter fileWriter = obtainFileWriter(Const.DEFAULT_DECRYPT_OUTPUT_FILEPATH);
-
-        bruteForce.doAction(fileReader, fileWriter);
-        console.printFileDecryptedByBruteForce();
+        switch (mode) {
+            case ENCRYPT:
+                encrypt.doAction(fileReader, fileWriter, key);
+                console.printFileEncrypted();
+                break;
+            case DECRYPT:
+                decrypt.doAction(fileReader, fileWriter, key);
+                console.printFileDecrypted();
+                break;
+            case BRUTEFORCE:
+                bruteForce.doAction(fileReader, fileWriter);
+                console.printFileDecryptedByBruteForce();
+        }
 
         try {
             fileReader.close();
