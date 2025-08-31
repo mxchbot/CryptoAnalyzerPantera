@@ -1,6 +1,6 @@
 package com.javarush.chebotarev.component;
 
-public interface Messages {
+public interface Const {
     String GREETINGS = "-=Crypto Analyzer=-";
     String LINE = "-".repeat(20);
     String MENU = LINE + '\n' +
@@ -23,4 +23,8 @@ public interface Messages {
     String FILE_DECRYPTED = "File decrypted successfully!";
     String CURRENT_WORKING_DIRECTORY_FORMAT = "Current working directory: \"%s\"\n";
     String FILE_DECRYPTED_BY_BRUTE_FORCE = "File decrypted successfully by brute-force!";
+    String DEFAULT_ENCRYPT_INPUT_FILEPATH = "./text/text.txt";
+    String DEFAULT_ENCRYPT_OUTPUT_FILEPATH = "./text/out.txt";
+    String DEFAULT_DECRYPT_INPUT_FILEPATH = DEFAULT_ENCRYPT_OUTPUT_FILEPATH;
+    String DEFAULT_DECRYPT_OUTPUT_FILEPATH = "./text/text2.txt";
 }

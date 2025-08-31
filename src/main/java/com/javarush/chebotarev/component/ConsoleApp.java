@@ -41,8 +41,8 @@ public class ConsoleApp {
     }
 
     private void doEncrypt() {
-        RandomAccessFile fileReader = obtainFileReader(DEFAULT_ENCRYPT_INPUT_FILEPATH);
-        BufferedWriter fileWriter = obtainFileWriter(DEFAULT_ENCRYPT_OUTPUT_FILEPATH);
+        RandomAccessFile fileReader = obtainFileReader(Const.DEFAULT_ENCRYPT_INPUT_FILEPATH);
+        BufferedWriter fileWriter = obtainFileWriter(Const.DEFAULT_ENCRYPT_OUTPUT_FILEPATH);
         int key = obtainKey();
 
         encrypt.doAction(fileReader, fileWriter, key);
@@ -57,8 +57,8 @@ public class ConsoleApp {
     }
 
     private void doDecrypt() {
-        RandomAccessFile fileReader = obtainFileReader(DEFAULT_DECRYPT_INPUT_FILEPATH);
-        BufferedWriter fileWriter = obtainFileWriter(DEFAULT_DECRYPT_OUTPUT_FILEPATH);
+        RandomAccessFile fileReader = obtainFileReader(Const.DEFAULT_DECRYPT_INPUT_FILEPATH);
+        BufferedWriter fileWriter = obtainFileWriter(Const.DEFAULT_DECRYPT_OUTPUT_FILEPATH);
         int key = obtainKey();
 
         decrypt.doAction(fileReader, fileWriter, key);
@@ -73,8 +73,8 @@ public class ConsoleApp {
     }
 
     private void doDecryptByBruteForce() {
-        RandomAccessFile fileReader = obtainFileReader(DEFAULT_DECRYPT_INPUT_FILEPATH);
-        BufferedWriter fileWriter = obtainFileWriter(DEFAULT_DECRYPT_OUTPUT_FILEPATH);
+        RandomAccessFile fileReader = obtainFileReader(Const.DEFAULT_DECRYPT_INPUT_FILEPATH);
+        BufferedWriter fileWriter = obtainFileWriter(Const.DEFAULT_DECRYPT_OUTPUT_FILEPATH);
 
         bruteForce.doAction(fileReader, fileWriter);
         console.printFileDecryptedByBruteForce();
@@ -177,8 +177,4 @@ public class ConsoleApp {
     private final Encrypt encrypt;
     private final Decrypt decrypt;
     private final BruteForce bruteForce;
-    private static final String DEFAULT_ENCRYPT_INPUT_FILEPATH = "./text/text.txt";
-    private static final String DEFAULT_ENCRYPT_OUTPUT_FILEPATH = "./text/out.txt";
-    private static final String DEFAULT_DECRYPT_INPUT_FILEPATH = DEFAULT_ENCRYPT_OUTPUT_FILEPATH;
-    private static final String DEFAULT_DECRYPT_OUTPUT_FILEPATH = "./text/text2.txt";
 }
