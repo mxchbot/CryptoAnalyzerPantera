@@ -6,8 +6,8 @@ import java.util.Map;
 public class Alphabet {
 
     public Alphabet() {
-        for (int i = 0; i < CHARACTERS.length; i++) {
-            indexMap.put(CHARACTERS[i], i);
+        for (int i = 0; i < characters.length; i++) {
+            indexMap.put(characters[i], i);
         }
     }
 
@@ -17,15 +17,15 @@ public class Alphabet {
     }
 
     public int getLength() {
-        return CHARACTERS.length;
+        return characters.length;
     }
 
     public char getCharacter(int index) {
-        return CHARACTERS[index];
+        return characters[index];
     }
 
     private final Map<Character, Integer> indexMap = new HashMap<>();
-    private final char[] CHARACTERS = {
+    private final char[] characters = {
             'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж',
             'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О',
             'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц',
